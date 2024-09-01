@@ -27,6 +27,4 @@ public class Employee {
     @ManyToOne
     @JoinColumn(name = "manager_id")
     private Employee manager;
-
-    // Другие поля и методы
 }
