@@ -1,6 +1,7 @@
 package ru.egartech.employeemanagementsystem.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.egartech.employeemanagementsystem.model.Employee;
 import ru.egartech.employeemanagementsystem.repository.EmployeeRepository;
@@ -24,5 +25,23 @@ public class EmployeeController {
         return employeeRepository.save(employee);
     }
 
-    // Другие методы (update, delete) можно добавить здесь
+    @PutMapping("/{id}")
+    public ResponseEntity<Employee> updateEmployee(@PathVariable Long id, @RequestBody Employee employeeDetails) {
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Employee not found with id " + id));
+        employee.setFirstName(employeeDetails.getFirstName());
+        employee.setLastName(employeeDetails.getLastName());
+        employee.setEmail(employeeDetails.getEmail());
+        employee.setPosition(employeeDetails.getPosition());
+        final Employee updatedEmployee = employeeRepository.save(employee);
+        return ResponseEntity.ok(updatedEmployee);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteEmployee(@PathVariable Long id) {
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Employee not found with id " + id));
+        employeeRepository.delete(employee);
+        return ResponseEntity.noContent().build();
+    }
 }
