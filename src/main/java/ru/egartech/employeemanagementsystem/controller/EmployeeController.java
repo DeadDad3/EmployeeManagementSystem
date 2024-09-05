@@ -20,6 +20,13 @@ public class EmployeeController {
         return employeeRepository.findAll();
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Employee> getEmployeeById(@PathVariable Long id) {
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Employee not found with id " + id));
+        return ResponseEntity.ok(employee);
+    }
+
     @PostMapping
     public Employee createEmployee(@RequestBody Employee employee) {
         return employeeRepository.save(employee);

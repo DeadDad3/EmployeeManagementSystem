@@ -3,10 +3,9 @@ package ru.egartech.employeemanagementsystem.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.egartech.employeemanagementsystem.model.MoodLog;
 import ru.egartech.employeemanagementsystem.model.Notification;
-import ru.egartech.employeemanagementsystem.repository.MoodLogRepository;
 import ru.egartech.employeemanagementsystem.repository.NotificationRepository;
+import ru.egartech.employeemanagementsystem.service.TelegramService;
 
 import java.util.List;
 
@@ -14,12 +13,25 @@ import java.util.List;
 @RequestMapping("/notifications")
 public class NotificationController {
 
+    private final TelegramService telegramService;
+
+    @Autowired
+    public NotificationController(TelegramService telegramService) {
+        this.telegramService = telegramService;
+    }
+
     @Autowired
     private NotificationRepository notificationRepository;
 
     @GetMapping
     public List<Notification> getAllNotifications() {
         return notificationRepository.findAll();
+    }
+
+    @GetMapping("/send")
+    public String sendNotification() {
+        telegramService.sendMessage("Ваше уведомление отправлено!");
+        return "Уведомление отправлено!";
     }
 
     @PostMapping
