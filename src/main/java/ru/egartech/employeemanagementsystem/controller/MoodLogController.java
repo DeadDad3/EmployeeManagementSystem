@@ -1,47 +1,53 @@
 package ru.egartech.employeemanagementsystem.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.egartech.employeemanagementsystem.dto.MoodLogDto;
 import ru.egartech.employeemanagementsystem.model.MoodLog;
-import ru.egartech.employeemanagementsystem.repository.MoodLogRepository;
+import ru.egartech.employeemanagementsystem.service.impl.MoodLogService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/mood-logs")
+@RequestMapping("/api/moodlog")
 public class MoodLogController {
 
+    private final MoodLogService moodLogService;
+
     @Autowired
-    private MoodLogRepository moodLogRepository;
+    public MoodLogController(MoodLogService moodLogService) {
+        this.moodLogService = moodLogService;
+    }
 
     @GetMapping
-    public List<MoodLog> getAllMoodLogs() {
-        return moodLogRepository.findAll();
+    public List<MoodLogDto> getAllMoodLogs() {
+        return moodLogService.getAllMoodLogs().stream()
+                .map(moodLogService::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping("/{id}")
+    public MoodLogDto getMoodLogById(@PathVariable Long id) {
+        MoodLog moodLog = moodLogService.getMoodLogById(id)
+                .orElseThrow(() -> new RuntimeException("Лог настроения не найден"));
+        return moodLogService.convertToDto(moodLog);
     }
 
     @PostMapping
-    public MoodLog createMoodLog(@RequestBody MoodLog moodLog) {
-        return moodLogRepository.save(moodLog);
+    public MoodLogDto createMoodLog(@RequestBody MoodLog moodLog) {
+        MoodLog createdMoodLog = moodLogService.createMoodLog(moodLog);
+        return moodLogService.convertToDto(createdMoodLog);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MoodLog> updateMoodLog(@PathVariable Long id, @RequestBody MoodLog moodLogDetails) {
-        MoodLog moodLog = moodLogRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("MoodLog not found with id " + id));
-        moodLog.setMood(moodLogDetails.getMood());
-        moodLog.setReason(moodLogDetails.getReason());
-        moodLog.setDate(moodLogDetails.getDate());
-        moodLog.setEmployee(moodLogDetails.getEmployee());
-        final MoodLog updatedMoodLog = moodLogRepository.save(moodLog);
-        return ResponseEntity.ok(updatedMoodLog);
+    public MoodLogDto updateMoodLog(@PathVariable Long id, @RequestBody MoodLog moodLog) {
+        MoodLog updatedMoodLog = moodLogService.updateMoodLog(id, moodLog);
+        return moodLogService.convertToDto(updatedMoodLog);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMoodLog(@PathVariable Long id) {
-        MoodLog moodLog = moodLogRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("MoodLog not found with id " + id));
-        moodLogRepository.delete(moodLog);
-        return ResponseEntity.noContent().build();
+    public void deleteMoodLog(@PathVariable Long id) {
+        moodLogService.deleteMoodLog(id);
     }
 }

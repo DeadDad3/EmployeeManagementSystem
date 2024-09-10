@@ -1,61 +1,53 @@
 package ru.egartech.employeemanagementsystem.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.egartech.employeemanagementsystem.dto.NotificationDto;
 import ru.egartech.employeemanagementsystem.model.Notification;
-import ru.egartech.employeemanagementsystem.repository.NotificationRepository;
-import ru.egartech.employeemanagementsystem.service.TelegramService;
+import ru.egartech.employeemanagementsystem.service.impl.NotificationService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/notifications")
+@RequestMapping("/api/notifications")
 public class NotificationController {
 
-    private final TelegramService telegramService;
+    private final NotificationService notificationService;
 
     @Autowired
-    public NotificationController(TelegramService telegramService) {
-        this.telegramService = telegramService;
+    public NotificationController(NotificationService notificationService) {
+        this.notificationService = notificationService;
     }
-
-    @Autowired
-    private NotificationRepository notificationRepository;
 
     @GetMapping
-    public List<Notification> getAllNotifications() {
-        return notificationRepository.findAll();
+    public List<NotificationDto> getAllNotifications() {
+        return notificationService.getAllNotifications().stream()
+                .map(notificationService::convertToDto)
+                .collect(Collectors.toList());
     }
 
-    @GetMapping("/send")
-    public String sendNotification() {
-        telegramService.sendMessage("Ваше уведомление отправлено!");
-        return "Уведомление отправлено!";
+    @GetMapping("/{id}")
+    public NotificationDto getNotificationById(@PathVariable Long id) {
+        Notification notification = notificationService.getNotificationById(id)
+                .orElseThrow(() -> new RuntimeException("Уведомление не найдено"));
+        return notificationService.convertToDto(notification);
     }
 
     @PostMapping
-    public Notification createNotification(@RequestBody Notification notification) {
-        return notificationRepository.save(notification);
+    public NotificationDto createNotification(@RequestBody Notification notification) {
+        Notification createdNotification = notificationService.createNotification(notification);
+        return notificationService.convertToDto(createdNotification);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Notification> updateNotification(@PathVariable Long id, @RequestBody Notification notificationDetails) {
-        Notification notification = notificationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Notification not found with id " + id));
-        notification.setType(notificationDetails.getType());
-        notification.setContent(notificationDetails.getContent());
-        notification.setStatus(notificationDetails.getStatus());
-        notification.setEmployee(notificationDetails.getEmployee());
-        final Notification updatedNotification = notificationRepository.save(notification);
-        return ResponseEntity.ok(updatedNotification);
+    public NotificationDto updateNotification(@PathVariable Long id, @RequestBody Notification notification) {
+        Notification updatedNotification = notificationService.updateNotification(id, notification);
+        return notificationService.convertToDto(updatedNotification);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteNotification(@PathVariable Long id) {
-        Notification notification = notificationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Notification not found with id " + id));
-        notificationRepository.delete(notification);
-        return ResponseEntity.noContent().build();
+    public void deleteNotification(@PathVariable Long id) {
+        notificationService.deleteNotification(id);
     }
 }

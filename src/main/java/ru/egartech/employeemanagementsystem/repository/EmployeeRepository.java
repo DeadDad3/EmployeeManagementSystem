@@ -6,5 +6,4 @@ import ru.egartech.employeemanagementsystem.model.Employee;
 
 @Repository
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
-    // Методы поиска по запросу
 }
