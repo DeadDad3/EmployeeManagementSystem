@@ -27,4 +27,9 @@ public class MoodLog {
 
     @Column(name = "reason")
     private String reason;
+
+    public MoodLog() {
+        // Устанавливаем текущую дату
+        this.date = new Date();
+    }
 }

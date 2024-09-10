@@ -9,6 +9,18 @@ public class TaskDto {
     private String employeeFirstName;
     private String employeeLastName;
 
+    public TaskDto() {}
+
+    public TaskDto(Long id, String title, String description, String status, Long employeeId, String employeeFirstName, String employeeLastName) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.status = status;
+        this.employeeId = employeeId;
+        this.employeeFirstName = employeeFirstName;
+        this.employeeLastName = employeeLastName;
+    }
+
     public Long getId() {
         return id;
     }

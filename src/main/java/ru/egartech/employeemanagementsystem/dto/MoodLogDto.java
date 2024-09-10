@@ -8,6 +8,18 @@ public class MoodLogDto {
     private String employeeFirstName;
     private String employeeLastName;
 
+    public MoodLogDto(Long id, String mood, String reason, Long employeeId, String employeeFirstName, String employeeLastName) {
+        this.id = id;
+        this.mood = mood;
+        this.reason = reason;
+        this.employeeId = employeeId;
+        this.employeeFirstName = employeeFirstName;
+        this.employeeLastName = employeeLastName;
+    }
+
+    public MoodLogDto() {
+    }
+
     public Long getId() {
         return id;
     }

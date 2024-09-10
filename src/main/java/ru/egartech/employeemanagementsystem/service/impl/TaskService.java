@@ -29,9 +29,13 @@ public class TaskService {
         dto.setTitle(task.getTitle());
         dto.setDescription(task.getDescription());
         dto.setStatus(task.getStatus());
-        dto.setEmployeeId(task.getEmployee().getId());
-        dto.setEmployeeFirstName(task.getEmployee().getFirstName());
-        dto.setEmployeeLastName(task.getEmployee().getLastName());
+
+        Employee employee = task.getEmployee();
+        if (employee != null) {
+            dto.setEmployeeId(employee.getId());
+            dto.setEmployeeFirstName(employee.getFirstName());
+            dto.setEmployeeLastName(employee.getLastName());
+        }
         return dto;
     }
 
