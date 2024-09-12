@@ -35,8 +35,8 @@ public class NotificationController {
     }
 
     @PostMapping
-    public NotificationDto createNotification(@RequestBody Notification notification) {
-        Notification createdNotification = notificationService.createNotification(notification);
+    public NotificationDto createNotification(@RequestBody NotificationDto notificationDto) {
+        Notification createdNotification = notificationService.createNotification(notificationDto);
         return notificationService.convertToDto(createdNotification);
     }
 
