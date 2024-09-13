@@ -27,4 +27,10 @@ public class Employee {
     @ManyToOne
     @JoinColumn(name = "manager_id")
     private Employee manager;
+
+    @Column(name = "chat_id")
+    private String chatId;
+
+    @Column(name = "username")
+    private String username;
 }

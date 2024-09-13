@@ -27,7 +27,6 @@ public class NotificationService {
         this.telegramService = telegramService;
     }
 
-
     public List<Notification> getAllNotifications() {
         return notificationRepository.findAll();
     }
@@ -49,13 +48,13 @@ public class NotificationService {
         Notification savedNotification = notificationRepository.save(notification);
 
         try {
-            telegramService.sendMessage("У вас новая задача");
+            String chatId = savedNotification.getEmployee().getChatId();
+            telegramService.sendMessage(Long.parseLong(chatId), "У вас новая задача", null);
             savedNotification.setStatus("отправлено");
         } catch (Exception e) {
             savedNotification.setStatus("не удалось отправить");
             log.error("Ошибка отправки уведомления", e);
         }
-
 
         return notificationRepository.save(savedNotification);
     }
