@@ -1,49 +1,62 @@
 package ru.egartech.employeemanagementsystem.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description = "DTO для представления сотрудника")
 public class EmployeeDto {
-    private Long id;
-    private String firstName;
-    private String lastName;
-    private String position;
-    private String email;
 
-    public Long getId() {
-        return id;
-    }
+  @Schema(description = "Идентификатор сотрудника", example = "1")
+  private Long id;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+  @Schema(description = "Имя сотрудника", example = "Иван")
+  private String firstName;
 
-    public String getFirstName() {
-        return firstName;
-    }
+  @Schema(description = "Фамилия сотрудника", example = "Иванов")
+  private String lastName;
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
+  @Schema(description = "Должность сотрудника", example = "Менеджер")
+  private String position;
 
-    public String getLastName() {
-        return lastName;
-    }
+  @Schema(description = "Email сотрудника", example = "ivan.ivanov@example.com")
+  private String email;
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
+  public Long getId() {
+    return id;
+  }
 
-    public String getPosition() {
-        return position;
-    }
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-    public void setPosition(String position) {
-        this.position = position;
-    }
+  public String getFirstName() {
+    return firstName;
+  }
 
-    public String getEmail() {
-        return email;
-    }
+  public void setFirstName(String firstName) {
+    this.firstName = firstName;
+  }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+  public String getLastName() {
+    return lastName;
+  }
+
+  public void setLastName(String lastName) {
+    this.lastName = lastName;
+  }
+
+  public String getPosition() {
+    return position;
+  }
+
+  public void setPosition(String position) {
+    this.position = position;
+  }
+
+  public String getEmail() {
+    return email;
+  }
+
+  public void setEmail(String email) {
+    this.email = email;
+  }
 }

@@ -11,15 +11,16 @@ import ru.egartech.employeemanagementsystem.service.TelegramService;
 @SpringBootApplication
 public class EmployeeManagementSystemApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(EmployeeManagementSystemApplication.class, args);
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(EmployeeManagementSystemApplication.class, args);
+  }
 
-    @Bean
-    public TelegramBotsApi telegramBotsApi(TelegramService telegramService) throws TelegramApiException {
-        TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
-        botsApi.registerBot(telegramService);
-        return botsApi;
-    }
+  @Bean
+  public TelegramBotsApi telegramBotsApi(TelegramService telegramService)
+      throws TelegramApiException {
+    TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
+    botsApi.registerBot(telegramService);
+    return botsApi;
+  }
 
 }

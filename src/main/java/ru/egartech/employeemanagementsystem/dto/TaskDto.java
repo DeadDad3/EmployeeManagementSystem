@@ -1,79 +1,98 @@
 package ru.egartech.employeemanagementsystem.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description = "DTO для представления задачи")
 public class TaskDto {
-    private Long id;
-    private String title;
-    private String description;
-    private String status;
-    private Long employeeId;
-    private String employeeFirstName;
-    private String employeeLastName;
 
-    public TaskDto() {}
+  @Schema(description = "Идентификатор задачи", example = "101")
+  private Long id;
 
-    public TaskDto(Long id, String title, String description, String status, Long employeeId, String employeeFirstName, String employeeLastName) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.status = status;
-        this.employeeId = employeeId;
-        this.employeeFirstName = employeeFirstName;
-        this.employeeLastName = employeeLastName;
-    }
+  @Schema(description = "Название задачи", example = "Сделать отчет")
+  private String title;
 
-    public Long getId() {
-        return id;
-    }
+  @Schema(description = "Описание задачи", example = "Подготовить еженедельный отчет по продажам")
+  private String description;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+  @Schema(description = "Статус задачи", example = "В процессе")
+  private String status;
 
-    public String getTitle() {
-        return title;
-    }
+  @Schema(description = "Идентификатор сотрудника", example = "1")
+  private Long employeeId;
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+  @Schema(description = "Имя сотрудника", example = "Иван")
+  private String employeeFirstName;
 
-    public String getDescription() {
-        return description;
-    }
+  @Schema(description = "Фамилия сотрудника", example = "Иванов")
+  private String employeeLastName;
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+  public TaskDto() {
+  }
 
-    public String getStatus() {
-        return status;
-    }
+  public TaskDto(Long id, String title, String description, String status, Long employeeId,
+      String employeeFirstName, String employeeLastName) {
+    this.id = id;
+    this.title = title;
+    this.description = description;
+    this.status = status;
+    this.employeeId = employeeId;
+    this.employeeFirstName = employeeFirstName;
+    this.employeeLastName = employeeLastName;
+  }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
+  public Long getId() {
+    return id;
+  }
 
-    public Long getEmployeeId() {
-        return employeeId;
-    }
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-    public void setEmployeeId(Long employeeId) {
-        this.employeeId = employeeId;
-    }
+  public String getTitle() {
+    return title;
+  }
 
-    public String getEmployeeFirstName() {
-        return employeeFirstName;
-    }
+  public void setTitle(String title) {
+    this.title = title;
+  }
 
-    public void setEmployeeFirstName(String employeeFirstName) {
-        this.employeeFirstName = employeeFirstName;
-    }
+  public String getDescription() {
+    return description;
+  }
 
-    public String getEmployeeLastName() {
-        return employeeLastName;
-    }
+  public void setDescription(String description) {
+    this.description = description;
+  }
 
-    public void setEmployeeLastName(String employeeLastName) {
-        this.employeeLastName = employeeLastName;
-    }
+  public String getStatus() {
+    return status;
+  }
+
+  public void setStatus(String status) {
+    this.status = status;
+  }
+
+  public Long getEmployeeId() {
+    return employeeId;
+  }
+
+  public void setEmployeeId(Long employeeId) {
+    this.employeeId = employeeId;
+  }
+
+  public String getEmployeeFirstName() {
+    return employeeFirstName;
+  }
+
+  public void setEmployeeFirstName(String employeeFirstName) {
+    this.employeeFirstName = employeeFirstName;
+  }
+
+  public String getEmployeeLastName() {
+    return employeeLastName;
+  }
+
+  public void setEmployeeLastName(String employeeLastName) {
+    this.employeeLastName = employeeLastName;
+  }
 }

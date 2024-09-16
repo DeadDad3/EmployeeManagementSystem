@@ -14,59 +14,59 @@ import java.util.Optional;
 @Service
 public class TaskService {
 
-    private final TaskRepository taskRepository;
-    private final EmployeeRepository employeeRepository;
+  private final TaskRepository taskRepository;
+  private final EmployeeRepository employeeRepository;
 
-    @Autowired
-    public TaskService(TaskRepository taskRepository, EmployeeRepository employeeRepository) {
-        this.taskRepository = taskRepository;
-        this.employeeRepository = employeeRepository;
+  @Autowired
+  public TaskService(TaskRepository taskRepository, EmployeeRepository employeeRepository) {
+    this.taskRepository = taskRepository;
+    this.employeeRepository = employeeRepository;
+  }
+
+  public TaskDto convertToDto(Task task) {
+    TaskDto dto = new TaskDto();
+    dto.setId(task.getId());
+    dto.setTitle(task.getTitle());
+    dto.setDescription(task.getDescription());
+    dto.setStatus(task.getStatus());
+
+    Employee employee = task.getEmployee();
+    if (employee != null) {
+      dto.setEmployeeId(employee.getId());
+      dto.setEmployeeFirstName(employee.getFirstName());
+      dto.setEmployeeLastName(employee.getLastName());
     }
+    return dto;
+  }
 
-    public TaskDto convertToDto(Task task) {
-        TaskDto dto = new TaskDto();
-        dto.setId(task.getId());
-        dto.setTitle(task.getTitle());
-        dto.setDescription(task.getDescription());
-        dto.setStatus(task.getStatus());
+  public List<Task> getAllTasks() {
+    return taskRepository.findAll();
+  }
 
-        Employee employee = task.getEmployee();
-        if (employee != null) {
-            dto.setEmployeeId(employee.getId());
-            dto.setEmployeeFirstName(employee.getFirstName());
-            dto.setEmployeeLastName(employee.getLastName());
-        }
-        return dto;
-    }
+  public Optional<Task> getTaskById(Long id) {
+    return taskRepository.findById(id);
+  }
 
-    public List<Task> getAllTasks() {
-        return taskRepository.findAll();
-    }
+  public Task createTask(Task task) {
+    return taskRepository.save(task);
+  }
 
-    public Optional<Task> getTaskById(Long id) {
-        return taskRepository.findById(id);
-    }
+  public Task updateTask(Long id, Task updatedTask) {
+    return taskRepository.findById(id)
+        .map(task -> {
+          task.setTitle(updatedTask.getTitle());
+          task.setDescription(updatedTask.getDescription());
+          task.setStatus(updatedTask.getStatus());
+          return taskRepository.save(task);
+        })
+        .orElseThrow(() -> new RuntimeException("Задача не найдена"));
+  }
 
-    public Task createTask(Task task) {
-        return taskRepository.save(task);
-    }
+  public void deleteTask(Long id) {
+    taskRepository.deleteById(id);
+  }
 
-    public Task updateTask(Long id, Task updatedTask) {
-        return taskRepository.findById(id)
-                .map(task -> {
-                    task.setTitle(updatedTask.getTitle());
-                    task.setDescription(updatedTask.getDescription());
-                    task.setStatus(updatedTask.getStatus());
-                    return taskRepository.save(task);
-                })
-                .orElseThrow(() -> new RuntimeException("Задача не найдена"));
-    }
-
-    public void deleteTask(Long id) {
-        taskRepository.deleteById(id);
-    }
-
-    public Optional<Employee> getEmployeeById(Long id) {
-        return employeeRepository.findById(id);
-    }
+  public Optional<Employee> getEmployeeById(Long id) {
+    return employeeRepository.findById(id);
+  }
 }

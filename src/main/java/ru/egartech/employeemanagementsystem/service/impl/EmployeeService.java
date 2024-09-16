@@ -8,52 +8,58 @@ import ru.egartech.employeemanagementsystem.repository.EmployeeRepository;
 
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
 public class EmployeeService {
 
-    private final EmployeeRepository employeeRepository;
+  private final EmployeeRepository employeeRepository;
 
-    @Autowired
-    public EmployeeService(EmployeeRepository employeeRepository) {
-        this.employeeRepository = employeeRepository;
-    }
+  @Autowired
+  public EmployeeService(EmployeeRepository employeeRepository) {
+    this.employeeRepository = employeeRepository;
+  }
 
-    public EmployeeDto convertToDto(Employee employee) {
-        EmployeeDto dto = new EmployeeDto();
-        dto.setId(employee.getId());
-        dto.setFirstName(employee.getFirstName());
-        dto.setLastName(employee.getLastName());
-        dto.setPosition(employee.getPosition());
-        dto.setEmail(employee.getEmail());
-        return dto;
-    }
+  public EmployeeDto convertToDto(Employee employee) {
+    EmployeeDto dto = new EmployeeDto();
+    dto.setId(employee.getId());
+    dto.setFirstName(employee.getFirstName());
+    dto.setLastName(employee.getLastName());
+    dto.setPosition(employee.getPosition());
+    dto.setEmail(employee.getEmail());
+    return dto;
+  }
 
-    public List<Employee> getAllEmployees() {
-        return employeeRepository.findAll();
-    }
+  public List<Employee> getAllEmployees() {
+    return employeeRepository.findAll();
+  }
 
-    public Optional<Employee> getEmployeeById(Long id) {
-        return employeeRepository.findById(id);
-    }
+  public Optional<Employee> getEmployeeById(Long id) {
+    return employeeRepository.findById(id);
+  }
 
-    public Employee createEmployee(Employee employee) {
-        return employeeRepository.save(employee);
-    }
+  public Employee createEmployee(Employee employee) {
+    return employeeRepository.save(employee);
+  }
 
-    public Employee updateEmployee(Long id, Employee updatedEmployee) {
-        return employeeRepository.findById(id)
-                .map(employee -> {
-                    employee.setFirstName(updatedEmployee.getFirstName());
-                    employee.setLastName(updatedEmployee.getLastName());
-                    employee.setPosition(updatedEmployee.getPosition());
-                    return employeeRepository.save(employee);
-                })
-                .orElseThrow(() -> new RuntimeException("Сотрудник не найден"));
-    }
+  public Employee updateEmployee(Long id, Employee updatedEmployee) {
+    return employeeRepository.findById(id)
+        .map(employee -> {
+          employee.setFirstName(updatedEmployee.getFirstName());
+          employee.setLastName(updatedEmployee.getLastName());
+          employee.setPosition(updatedEmployee.getPosition());
+          return employeeRepository.save(employee);
+        })
+        .orElseThrow(() -> new RuntimeException("Сотрудник не найден"));
+  }
 
-    public void deleteEmployee(Long id) {
-        employeeRepository.deleteById(id);
-    }
+  public void deleteEmployee(Long id) {
+    Employee employee = employeeRepository.findById(id)
+        .orElseThrow(() -> new NoSuchElementException("Сотрудник с id " + id + " не найден"));
+
+    System.out.println("Попытка удаления сотрудника с ID: " + id);
+
+    employeeRepository.delete(employee);
+  }
 }
