@@ -3,63 +3,54 @@ package ru.egartech.employeemanagementsystem.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.egartech.employeemanagementsystem.dto.EmployeeDto;
+import ru.egartech.employeemanagementsystem.mapper.EmployeeMapper;
 import ru.egartech.employeemanagementsystem.model.Employee;
 import ru.egartech.employeemanagementsystem.repository.EmployeeRepository;
 
-
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class EmployeeService {
 
   private final EmployeeRepository employeeRepository;
+  private final EmployeeMapper employeeMapper;
 
   @Autowired
-  public EmployeeService(EmployeeRepository employeeRepository) {
+  public EmployeeService(EmployeeRepository employeeRepository, EmployeeMapper employeeMapper) {
     this.employeeRepository = employeeRepository;
+    this.employeeMapper = employeeMapper;
   }
 
-  public EmployeeDto convertToDto(Employee employee) {
-    EmployeeDto dto = new EmployeeDto();
-    dto.setId(employee.getId());
-    dto.setFirstName(employee.getFirstName());
-    dto.setLastName(employee.getLastName());
-    dto.setPosition(employee.getPosition());
-    dto.setEmail(employee.getEmail());
-    return dto;
+  public EmployeeDto createEmployee(EmployeeDto employeeDto) {
+    Employee employee = employeeMapper.toEntity(employeeDto);
+    Employee savedEmployee = employeeRepository.save(employee);
+    return employeeMapper.toDto(savedEmployee);
   }
 
-  public List<Employee> getAllEmployees() {
-    return employeeRepository.findAll();
-  }
-
-  public Optional<Employee> getEmployeeById(Long id) {
-    return employeeRepository.findById(id);
-  }
-
-  public Employee createEmployee(Employee employee) {
-    return employeeRepository.save(employee);
-  }
-
-  public Employee updateEmployee(Long id, Employee updatedEmployee) {
+  public EmployeeDto getEmployee(Long id) {
     return employeeRepository.findById(id)
-        .map(employee -> {
-          employee.setFirstName(updatedEmployee.getFirstName());
-          employee.setLastName(updatedEmployee.getLastName());
-          employee.setPosition(updatedEmployee.getPosition());
-          return employeeRepository.save(employee);
-        })
+        .map(employeeMapper::toDto)
         .orElseThrow(() -> new RuntimeException("Сотрудник не найден"));
   }
 
+  public List<EmployeeDto> getAllEmployees() {
+    return employeeRepository.findAll()
+        .stream()
+        .map(employeeMapper::toDto)
+        .collect(Collectors.toList());
+  }
+
+  public EmployeeDto updateEmployee(Long id, EmployeeDto employeeDto) {
+    Employee existingEmployee = employeeRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Сотрдник не найден"));
+    Employee updatedEmployee = employeeMapper.toEntity(employeeDto);
+    updatedEmployee.setId(existingEmployee.getId());
+    Employee savedEmployee = employeeRepository.save(updatedEmployee);
+    return employeeMapper.toDto(savedEmployee);
+  }
+
   public void deleteEmployee(Long id) {
-    Employee employee = employeeRepository.findById(id)
-        .orElseThrow(() -> new NoSuchElementException("Сотрудник с id " + id + " не найден"));
-
-    System.out.println("Попытка удаления сотрудника с ID: " + id);
-
-    employeeRepository.delete(employee);
+    employeeRepository.deleteById(id);
   }
 }

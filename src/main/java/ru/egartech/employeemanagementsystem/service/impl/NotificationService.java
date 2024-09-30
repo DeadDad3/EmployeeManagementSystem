@@ -1,88 +1,68 @@
 package ru.egartech.employeemanagementsystem.service.impl;
 
-import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import ru.egartech.employeemanagementsystem.dto.NotificationDto;
-import ru.egartech.employeemanagementsystem.model.Employee;
+import ru.egartech.employeemanagementsystem.mapper.NotificationMapper;
 import ru.egartech.employeemanagementsystem.model.Notification;
-import ru.egartech.employeemanagementsystem.repository.EmployeeRepository;
 import ru.egartech.employeemanagementsystem.repository.NotificationRepository;
 import ru.egartech.employeemanagementsystem.service.TelegramService;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class NotificationService {
-
+  private final NotificationRepository notificationRepository;
+  private final NotificationMapper notificationMapper;
   private final TelegramService telegramService;
   private static final Logger log = LoggerFactory.getLogger(NotificationService.class);
-  private final NotificationRepository notificationRepository;
-  private final EmployeeRepository employeeRepository;
 
+  @Autowired
   public NotificationService(NotificationRepository notificationRepository,
-      EmployeeRepository employeeRepository, TelegramService telegramService) {
+      NotificationMapper notificationMapper,
+      TelegramService telegramService) {
     this.notificationRepository = notificationRepository;
-    this.employeeRepository = employeeRepository;
+    this.notificationMapper = notificationMapper;
     this.telegramService = telegramService;
   }
 
-  public List<Notification> getAllNotifications() {
-    return notificationRepository.findAll();
-  }
-
-  public Optional<Notification> getNotificationById(Long id) {
-    return notificationRepository.findById(id);
-  }
-
-  public Notification createNotification(NotificationDto notificationDto) {
-    Employee employee = employeeRepository.findById(notificationDto.getEmployeeId())
-        .orElseThrow(() -> new RuntimeException("Сотрудник не найден"));
-
-    Notification notification = new Notification();
-    notification.setEmployee(employee);
-    notification.setContent(notificationDto.getContent());
-    notification.setType(notificationDto.getType());
-    notification.setStatus("ожидает отправки");
-
+  public NotificationDto createNotification(NotificationDto notificationDto) {
+    Notification notification = notificationMapper.toEntity(notificationDto);
     Notification savedNotification = notificationRepository.save(notification);
 
-    try {
-      String chatId = savedNotification.getEmployee().getChatId();
-      telegramService.sendMessage(Long.parseLong(chatId), "У вас новая задача", null);
-      savedNotification.setStatus("отправлено");
-    } catch (Exception e) {
-      savedNotification.setStatus("не удалось отправить");
-      log.error("Ошибка отправки уведомления", e);
-    }
+    telegramService.sendNotification(savedNotification);
+    log.info("Уведомление создано и отослано в телеграм: {}", notification.getMessage());
 
-    return notificationRepository.save(savedNotification);
+    return notificationMapper.toDto(savedNotification);
   }
 
-
-  public Notification updateNotification(Long id, Notification updatedNotification) {
+  public NotificationDto getNotification(Long id) {
     return notificationRepository.findById(id)
-        .map(notification -> {
-          notification.setType(updatedNotification.getType());
-          notification.setContent(updatedNotification.getContent());
-          notification.setStatus(updatedNotification.getStatus());
-          return notificationRepository.save(notification);
-        })
+        .map(notificationMapper::toDto)
         .orElseThrow(() -> new RuntimeException("Уведомление не найдено"));
+  }
+
+  public List<NotificationDto> getAllNotifications() {
+    return notificationRepository.findAll()
+        .stream()
+        .map(notificationMapper::toDto)
+        .collect(Collectors.toList());
+  }
+
+  public NotificationDto updateNotification(Long id, NotificationDto notificationDto) {
+    Notification existingNotification = notificationRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Уведомление не найдено"));
+    Notification updatedNotification = notificationMapper.toEntity(notificationDto);
+    updatedNotification.setId(existingNotification.getId());
+    Notification savedNotification = notificationRepository.save(updatedNotification);
+
+    return notificationMapper.toDto(savedNotification);
   }
 
   public void deleteNotification(Long id) {
     notificationRepository.deleteById(id);
-  }
-
-  public NotificationDto convertToDto(Notification notification) {
-    NotificationDto dto = new NotificationDto();
-    dto.setId(notification.getId());
-    dto.setType(notification.getType());
-    dto.setContent(notification.getContent());
-    dto.setStatus(notification.getStatus());
-    dto.setEmployeeId(notification.getEmployee().getId());
-    return dto;
   }
 }
